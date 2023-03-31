@@ -27,6 +27,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
     super.dispose();
   }
 
+  List<ProductModel> listProductSearch = [];
+
   @override
   Widget build(BuildContext context) {
     bool isEmpty = false;
@@ -42,7 +44,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           centerTitle: true,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: TextWidget(
-            text: 'All Product',
+            text: catName,
             colors: color,
             fontsize: 20,
             isTitle: true,
@@ -82,22 +84,38 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 color: _searchTextFocusNode.hasFocus
                                     ? Colors.red
                                     : color)),
+                        onChanged: (value) {
+                          setState(() {
+                            listProductSearch =
+                                productProvider.searchQuery(value);
+                          });
+                        },
                       ),
                     ),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      //padding: EdgeInsets.zero,
-                      childAspectRatio: size.width / (size.height * 0.64),
-                      children: List.generate(productsByCat.length, (index) {
-                        return ChangeNotifierProvider.value(
-                            value: productsByCat[index],
-                            child: const FeedsWidget());
-                      }),
-                    ),
+                    _searchTextController.text.isNotEmpty &&
+                            listProductSearch.isEmpty
+                        ? const EmptyProductWidget(
+                            errorMessage:
+                                'No products found, please try another keyword')
+                        : GridView.count(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            //padding: EdgeInsets.zero,
+                            childAspectRatio: size.width / (size.height * 0.64),
+                            children: List.generate(
+                                _searchTextController.text.isNotEmpty
+                                    ? listProductSearch.length
+                                    : productsByCat.length, (index) {
+                              return ChangeNotifierProvider.value(
+                                  value: _searchTextController.text.isNotEmpty
+                                      ? listProductSearch[index]
+                                      : productsByCat[index],
+                                  child: const FeedsWidget());
+                            }),
+                          ),
                   ],
                 ),
               ));

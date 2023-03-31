@@ -2,10 +2,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:grocery_app/Providers/cart_provider.dart';
+import 'package:grocery_app/Providers/orders_provider.dart';
 import 'package:grocery_app/Providers/product_provider.dart';
 import 'package:grocery_app/Providers/viewed_provider.dart';
 import 'package:grocery_app/Providers/wishlist_provider.dart';
 import 'package:grocery_app/const/theme_data.dart';
+import 'package:grocery_app/fetch_screen.dart';
 import 'package:grocery_app/inner_screen/cat_screen.dart';
 import 'package:grocery_app/inner_screen/feeds_screen.dart';
 import 'package:grocery_app/inner_screen/on_sale_screen.dart';
@@ -15,7 +17,6 @@ import 'package:grocery_app/provider/dark_theme_provider.dart';
 import 'package:grocery_app/screens/auth/forget_password.dart';
 import 'package:grocery_app/screens/auth/login.dart';
 import 'package:grocery_app/screens/auth/register.dart';
-import 'package:grocery_app/screens/btm_bar_screen.dart';
 import 'package:grocery_app/viewed_recently/viewed_recently.dart';
 import 'package:grocery_app/wishlist/wishlist_screen.dart';
 import 'package:provider/provider.dart';
@@ -82,15 +83,17 @@ class _MyAppState extends State<MyApp> {
               ChangeNotifierProvider(
                 create: (context) => ViewedProvider(),
               ),
+              ChangeNotifierProvider(
+                create: (context) => OrdersProvider(),
+              ),
             ],
             child: Consumer<DarkThemeProvider>(
               builder: (context, value, child) {
                 return MaterialApp(
                   title: 'Flutter Demo',
                   theme: Styles.themeData(value.getDarkTheme, context),
-                  home:
-                      //const LoginScreen(),
-                      const BottomBarScreen(),
+                  home: const FetchScreen(),
+                  //  const BottomBarScreen(),
                   routes: {
                     OnSaleScreen.routeName: (context) => const OnSaleScreen(),
                     FeedScreen.routeName: (context) => const FeedScreen(),

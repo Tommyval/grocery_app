@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:grocery_app/const/consts.dart';
 import 'package:grocery_app/const/firebase_consts.dart';
+import 'package:grocery_app/fetch_screen.dart';
 import 'package:grocery_app/screens/auth/login.dart';
-import 'package:grocery_app/screens/btm_bar_screen.dart';
 import 'package:grocery_app/screens/loading_manager.dart';
 import 'package:grocery_app/services/global_methods.dart';
 import 'package:grocery_app/services/utils.dart';
@@ -48,18 +48,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _submitFormOnRegister() async {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
-    setState(() {
-      _isLoading = true;
-    });
+
     if (isValid) {
       _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true;
+      });
       try {
         await authInstance.createUserWithEmailAndPassword(
             email: _emailTextController.text.toLowerCase().trim(),
             password: _passTextController.text.trim());
         final User? user = authInstance.currentUser;
+        user?.updateDisplayName(_fullNameTextController.text);
+        user?.reload();
         final uid = user!.uid;
-        FirebaseFirestore.instance.collection('users').doc(uid).set({
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
           'id': uid,
           'name': _fullNameTextController.text,
           'email': _emailTextController.text,
@@ -69,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           'createAt': Timestamp.now()
         });
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const BottomBarScreen()));
+            MaterialPageRoute(builder: (context) => const FetchScreen()));
         print('successfully registered');
       } on FirebaseException catch (err) {
         GlobalMethods.errorDialog(context: context, subTitle: '${err.message}');

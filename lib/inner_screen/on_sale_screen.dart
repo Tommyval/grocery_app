@@ -9,9 +9,23 @@ import 'package:provider/provider.dart';
 
 import '../models/product_model.dart';
 
-class OnSaleScreen extends StatelessWidget {
+class OnSaleScreen extends StatefulWidget {
   static const routeName = '/OnSaleScreen';
   const OnSaleScreen({Key? key}) : super(key: key);
+
+  @override
+  State<OnSaleScreen> createState() => _OnSaleScreenState();
+}
+
+class _OnSaleScreenState extends State<OnSaleScreen> {
+  // @override
+  // void initState() {
+  //   final productProvider = Provider.of<ProductProvider>(
+  //     context, listen: false
+  //   );
+  //   productProvider.fetchProducts();
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +64,7 @@ class OnSaleScreen extends StatelessWidget {
                 mainAxisSpacing: 10,
                 //padding: EdgeInsets.zero,
                 childAspectRatio: size.width / (size.height * 0.55),
+
                 children: List.generate(productsOnsale.length, (index) {
                   return ChangeNotifierProvider.value(
                       value: productsOnsale[index],

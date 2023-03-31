@@ -14,6 +14,8 @@ import 'package:grocery_app/widgets/price_widget.dart';
 import 'package:grocery_app/widgets/text_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../Providers/viewed_provider.dart';
+
 class OnSaleWidget extends StatefulWidget {
   const OnSaleWidget({Key? key}) : super(key: key);
 
@@ -33,13 +35,14 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
     final wishListProvider = Provider.of<WishListProvider>(context);
     bool? isInWishList =
         wishListProvider.getWishListItems.containsKey(productModel.id);
-
+    final viewedProdProvider = Provider.of<ViewedProvider>(context);
     return Material(
       color: Theme.of(context).cardColor.withOpacity(0.9),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
+          viewedProdProvider.addProductToHistory(productModel.id);
           Navigator.pushNamed(context, ProductScreen.routeName,
               arguments: productModel.id);
         },
@@ -73,7 +76,7 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                           GestureDetector(
                             onTap: isInCart
                                 ? null
-                                : () {
+                                : () async {
                                     final User? user = authInstance.currentUser;
                                     // print('user id is $user!.uid');
                                     if (user == null) {
@@ -83,9 +86,14 @@ class _OnSaleWidgetState extends State<OnSaleWidget> {
                                               'No user found, please log in');
                                       return;
                                     }
-                                    cartProvider.addProductToCart(
+                                    await GlobalMethods.addToCart(
                                         productId: productModel.id,
-                                        quantity: 1);
+                                        quantity: 1,
+                                        context: context);
+                                    await cartProvider.fetchCart();
+                                    // cartProvider.addProductToCart(
+                                    //     productId: productModel.id,
+                                    //     quantity: 1);
                                   },
                             child: Icon(
                               isInCart ? IconlyBold.bag2 : IconlyLight.bag2,

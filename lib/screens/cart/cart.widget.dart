@@ -9,9 +9,10 @@ import 'package:grocery_app/inner_screen/product_screen.dart';
 import 'package:grocery_app/models/cart.models.dart';
 
 import 'package:grocery_app/services/utils.dart';
-import 'package:grocery_app/widgets/heart_btn.dart';
 import 'package:grocery_app/widgets/text_widgets.dart';
 import 'package:provider/provider.dart';
+
+import '../../widgets/heart_btn.dart';
 
 class CartWidget extends StatefulWidget {
   const CartWidget({Key? key, required this.q}) : super(key: key);
@@ -49,7 +50,7 @@ class _CartWidgetState extends State<CartWidget> {
         : getCurrProduct.price;
     final wishListProvider = Provider.of<WishListProvider>(context);
     bool? isInWishList =
-        wishListProvider.getWishListItems.containsKey(cartModel.id);
+        wishListProvider.getWishListItems.containsKey(getCurrProduct.id);
 
     return GestureDetector(
       onTap: () {
@@ -160,8 +161,11 @@ class _CartWidgetState extends State<CartWidget> {
                       child: Column(
                         children: [
                           InkWell(
-                            onTap: () {
-                              cartProvider.remove0neItem(cartModel.productId);
+                            onTap: () async {
+                              await cartProvider.remove0neItem(
+                                  productId: cartModel.productId,
+                                  cartId: cartModel.id,
+                                  quantity: cartModel.quantity);
                             },
                             child: const Icon(
                               CupertinoIcons.cart_badge_minus,
@@ -173,11 +177,12 @@ class _CartWidgetState extends State<CartWidget> {
                             height: 5,
                           ),
                           HeartBtn(
-                            productId: cartModel.id,
+                            productId: getCurrProduct.id,
                             isInWishList: isInWishList,
                           ),
                           TextWidget(
-                              text: '\$${usedPrice.toStringAsFixed(2)}}',
+                              text:
+                                  '\$${(usedPrice * int.parse(_quantityTextController.text)).toString()}}',
                               colors: color,
                               fontsize: 18)
                         ],

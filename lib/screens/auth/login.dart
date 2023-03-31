@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:grocery_app/const/consts.dart';
+import 'package:grocery_app/fetch_screen.dart';
 import 'package:grocery_app/screens/auth/forget_password.dart';
 import 'package:grocery_app/screens/auth/register.dart';
-import 'package:grocery_app/screens/btm_bar_screen.dart';
 import 'package:grocery_app/screens/loading_manager.dart';
 import 'package:grocery_app/services/global_methods.dart';
 import 'package:grocery_app/widgets/auth_button.dart';
@@ -40,17 +40,18 @@ class _LoginScreenState extends State<LoginScreen> {
   void _submitFormOnLogin() async {
     final isValid = _formKey.currentState!.validate();
     FocusScope.of(context).unfocus();
-    setState(() {
-      _isLoading = true;
-    });
+
     if (isValid) {
       _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true;
+      });
       try {
         await authInstance.signInWithEmailAndPassword(
             email: _emailTextController.text.toLowerCase().trim(),
             password: _passTextController.text.trim());
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const BottomBarScreen()));
+            MaterialPageRoute(builder: (context) => const FetchScreen()));
         print('successfully logged in');
       } on FirebaseException catch (err) {
         GlobalMethods.errorDialog(context: context, subTitle: '${err.message}');
@@ -256,8 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const BottomBarScreen(),
+                                      builder: (context) => const FetchScreen(),
                                     ));
                               },
                               buttonText: 'Continue as a guest',

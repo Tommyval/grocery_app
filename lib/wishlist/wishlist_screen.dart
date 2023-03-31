@@ -48,8 +48,9 @@ class WishlistScreen extends StatelessWidget {
                           context: context,
                           title: 'Empty your wishlist',
                           subTitle: 'Are you sure',
-                          fxn: () {
-                            wishListProvider.clearWishList();
+                          fxn: () async {
+                            await wishListProvider.clearOnlineWish();
+                            wishListProvider.clearLocalWish();
                           });
                     },
                     icon: Icon(

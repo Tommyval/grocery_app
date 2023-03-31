@@ -33,6 +33,7 @@ class _ProductScreenState extends State<ProductScreen> {
     final productProvider = Provider.of<ProductProvider>(context);
     final cartProvider = Provider.of<CartProvider>(context);
     final productId = ModalRoute.of(context)!.settings.arguments as String;
+
     final getCurrProduct = productProvider.findProdById(productId);
     final wishListProvider = Provider.of<WishListProvider>(context);
     bool? isInWishList =
@@ -46,7 +47,7 @@ class _ProductScreenState extends State<ProductScreen> {
     final viewedProdProvider = Provider.of<ViewedProvider>(context);
     return WillPopScope(
       onWillPop: () async {
-        viewedProdProvider.addProductToHistory(productId);
+        //  viewedProdProvider.addProductToHistory(productId);
         return true;
       },
       child: Scaffold(
@@ -283,7 +284,7 @@ class _ProductScreenState extends State<ProductScreen> {
                                 child: InkWell(
                                   onTap: isInCart
                                       ? null
-                                      : () {
+                                      : () async {
                                           final User? user =
                                               authInstance.currentUser;
                                           // print('user id is $user!.uid');
@@ -294,10 +295,16 @@ class _ProductScreenState extends State<ProductScreen> {
                                                     'No user found, please log in');
                                             return;
                                           }
-                                          cartProvider.addProductToCart(
+                                          await GlobalMethods.addToCart(
                                               productId: getCurrProduct.id,
                                               quantity: int.parse(
-                                                  _quntityTextController.text));
+                                                  _quntityTextController.text),
+                                              context: context);
+                                          await cartProvider.fetchCart();
+                                          // cartProvider.addProductToCart(
+                                          //     productId: getCurrProduct.id,
+                                          //     quantity: int.parse(
+                                          //         _quntityTextController.text));
                                         },
                                   borderRadius: BorderRadius.circular(10),
                                   child: Padding(

@@ -14,6 +14,8 @@ import 'package:grocery_app/widgets/price_widget.dart';
 import 'package:grocery_app/widgets/text_widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../Providers/viewed_provider.dart';
+
 class FeedsWidget extends StatefulWidget {
   const FeedsWidget({Key? key}) : super(key: key);
   @override
@@ -45,6 +47,7 @@ class _FeedsItemsState extends State<FeedsWidget> {
     final wishListProvider = Provider.of<WishListProvider>(context);
     bool? isInWishList =
         wishListProvider.getWishListItems.containsKey(productModel.id);
+    final viewedProdProvider = Provider.of<ViewedProvider>(context);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Material(
@@ -52,6 +55,7 @@ class _FeedsItemsState extends State<FeedsWidget> {
         color: Theme.of(context).cardColor.withOpacity(0.9),
         child: InkWell(
           onTap: () {
+            viewedProdProvider.addProductToHistory(productModel.id);
             // GlobalMethods.navigateTo(
             //     context: context, routeName: ProductScreen.routeName);
             Navigator.pushNamed(context, ProductScreen.routeName,
@@ -98,7 +102,7 @@ class _FeedsItemsState extends State<FeedsWidget> {
                       textPrice: _quantityTextController.text,
                     ),
                     const SizedBox(
-                      width: 20,
+                      width: 10,
                     ),
                     Flexible(
                       flex: 3,
@@ -147,7 +151,7 @@ class _FeedsItemsState extends State<FeedsWidget> {
                 child: TextButton(
                   onPressed: isInCart
                       ? null
-                      : () {
+                      : () async {
                           final User? user = authInstance.currentUser;
                           // print('user id is $user!.uid');
                           if (user == null) {
@@ -159,10 +163,15 @@ class _FeedsItemsState extends State<FeedsWidget> {
                           // if (_isInCart) {
                           //   return;
                           // }
-                          cartProvider.addProductToCart(
+                          await GlobalMethods.addToCart(
                               productId: productModel.id,
-                              quantity:
-                                  int.parse(_quantityTextController.text));
+                              quantity: int.parse(_quantityTextController.text),
+                              context: context);
+                          await cartProvider.fetchCart();
+                          // cartProvider.addProductToCart(
+                          //     productId: productModel.id,
+                          //     quantity:
+                          //         int.parse(_quantityTextController.text));
                         },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
